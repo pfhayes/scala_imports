@@ -7,11 +7,18 @@ debug = ("--debug" in sys.argv[1:])
 dry_run = ("--dry-run" in sys.argv[1:])
 
 def is_declaration(token) :
+  """
+  Checks if this token declares an identifier, so that identifier doesn't need
+  to be imported
+  """
   return token in [
       "class", "trait", "def", "val",
       "type", "var", "package", "object"]
 
 def get_used_tokens(filename) :
+  """
+  Get all the tokens that are referenced in this file
+  """
   lines = (line for line in open(filename, 'r'))
   lexer = lexers.get_lexer_for_filename(filename)
   seen = set([])
@@ -129,6 +136,10 @@ known_tokens = set([
   + ['Product' + str(i) for i in range(0,23)])
 
 def needs_import(token) :
+  """
+  Determines if this is a token that is not implicitly imported
+  by the scala runtime, and hence needs to be imported.
+  """
   return token not in known_tokens
 
 def token_valid(token) :
@@ -201,7 +212,10 @@ def can_import_from_file(filename) :
 def can_scan_for_imports(filename) :
   return filename.endswith('.scala')
 
-def get_imports(current_filename, new_tokens, imported_packages) :
+def lookup_imports(current_filename, new_tokens, imported_packages) :
+  """
+  Fetch the required imports from the tags file
+  """
   in_tokens = set(new_tokens)
   warned_tokens = set([])
   duplicate_tokens = set([])
@@ -241,6 +255,9 @@ def get_imports(current_filename, new_tokens, imported_packages) :
   return imports
 
 def add_imports(filename, imports) :
+  """
+  Inserts the imports into the specified file
+  """
   write_lines = []
   has_added_imports = False
 
@@ -266,6 +283,10 @@ def add_imports(filename, imports) :
         f.write(line)
 
 def fix_imports(write_lines) :
+  """
+  Does a quick cleanup pass, after importing, to make sure there are no extraneous
+  blank lines.
+  """
   real_lines = []
 
   idx = 0
@@ -307,7 +328,7 @@ if __name__ == "__main__" :
       continue
     imported_tokens, imported_packages = get_imported_tokens(f)
     new_tokens = get_unimported_tokens(f, imported_tokens)
-    imports = get_imports(f, new_tokens, imported_packages)
+    imports = lookup_imports(f, new_tokens, imported_packages)
     useful_imports = (i for i in imports if not i.startswith(current_package))
     add_imports(f, useful_imports)
     
