@@ -125,6 +125,7 @@ known_tokens = set([
   'Stream',
   'String',
   'StringBuilder',
+  'System',
   'Throwable',
   'Thread',
   'Triple',
