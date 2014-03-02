@@ -12,7 +12,7 @@ def is_declaration(token) :
       "type", "var", "package", "object"]
 
 def get_used_tokens(filename) :
-  lines = [line for line in open(filename, 'r')]
+  lines = (line for line in open(filename, 'r'))
   lexer = lexers.get_lexer_for_filename(filename)
   seen = set([])
 
@@ -247,7 +247,7 @@ def add_imports(filename, imports) :
   def do_add_imports() :
     for i in imports :
       print 'Adding import to %s: %s' % (filename, i)
-    write_lines.extend(["import " + i + "\n" for i in imports])
+    write_lines.extend(("import " + i + "\n" for i in imports))
 
   with open(filename, 'r') as f :
     for line in f :
@@ -294,7 +294,7 @@ def fix_imports(write_lines) :
 
 if __name__ == "__main__" :
   lines = subprocess.check_output(["git", "diff", "origin/master", "--numstat"]).split("\n")
-  files = [line.split("\t")[2] for line in lines if len(line) > 0]
+  files = (line.split("\t")[2] for line in lines if len(line) > 0)
   files_to_scan = (f for f in files if can_scan_for_imports(f))
 
   for f in files_to_scan:
@@ -308,6 +308,6 @@ if __name__ == "__main__" :
     imported_tokens, imported_packages = get_imported_tokens(f)
     new_tokens = get_unimported_tokens(f, imported_tokens)
     imports = get_imports(f, new_tokens, imported_packages)
-    useful_imports = [i for i in imports if not i.startswith(current_package)]
+    useful_imports = (i for i in imports if not i.startswith(current_package))
     add_imports(f, useful_imports)
     
