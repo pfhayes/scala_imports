@@ -330,6 +330,6 @@ if __name__ == "__main__" :
     imported_tokens, imported_packages = get_imported_tokens(f)
     new_tokens = get_unimported_tokens(f, imported_tokens)
     imports = lookup_imports(f, new_tokens, imported_packages)
-    useful_imports = (i for i in imports if not i.startswith(current_package))
+    useful_imports = [i for i in imports if not i.startswith(current_package)]
     add_imports(f, useful_imports)
     
