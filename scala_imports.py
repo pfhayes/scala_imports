@@ -197,13 +197,15 @@ def get_imported_tokens(filename) :
 
 def get_package(filename) :
   if can_import_from_file(filename) :
-    for line in open(filename, 'r') :
-      if line.startswith('package') and filename.endswith('.scala') :
-        return line.strip().split(" ")[-1]
-      if line.startswith('namespace java') and filename.endswith('.thrift') :
-        return line.strip().split(" ")[-1]
-    print 'Error. %s has no package declaration' % filename
-    return None
+    try :
+      for line in open(filename, 'r') :
+        if line.startswith('package') and filename.endswith('.scala') :
+          return line.strip().split(" ")[-1]
+        if line.startswith('namespace java') and filename.endswith('.thrift') :
+          return line.strip().split(" ")[-1]
+      print 'Error. %s has no package declaration' % filename
+    except IOError :
+      print "Couldn't get package from %s - skipping" % filename
   return None
 
 def can_import_from_file(filename) :
@@ -325,11 +327,12 @@ if __name__ == "__main__" :
     try :
       current_package = get_package(f)
     except IOError :
-      print "Couldn't read %s - skipping" %f
+      print "Couldn't read %s - skipping" % f
       continue
-    imported_tokens, imported_packages = get_imported_tokens(f)
-    new_tokens = get_unimported_tokens(f, imported_tokens)
-    imports = lookup_imports(f, new_tokens, imported_packages)
-    useful_imports = [i for i in imports if not i.startswith(current_package)]
-    add_imports(f, useful_imports)
+    if current_package :
+      imported_tokens, imported_packages = get_imported_tokens(f)
+      new_tokens = get_unimported_tokens(f, imported_tokens)
+      imports = lookup_imports(f, new_tokens, imported_packages)
+      useful_imports = [i for i in imports if not i.startswith(current_package)]
+      add_imports(f, useful_imports)
     
