@@ -12,6 +12,13 @@ Doesn't work perfectly, but is designed to do the heavy lifting for you in 95% o
 4. Run `scala_imports.py` to update all affected files.
 5. If desired, use another tool to cleanup/sort the added imports.
 
+## Args ##
+
+- You can specify the files you want scala_imports to run on. By default it
+  will run on everything you have changed since origin/master
+- Use --dry-run to just output what would be added.
+- Use --debug to debug
+
 ## Dependencies ##
 
 - scala
