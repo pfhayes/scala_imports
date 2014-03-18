@@ -5,6 +5,7 @@ from pygments import lexers
 
 debug = ("--debug" in sys.argv[1:])
 dry_run = ("--dry-run" in sys.argv[1:])
+provided_files = [f for f in sys.argv[1:] if not f.startswith('-')]
 
 def is_declaration(token) :
   """
@@ -39,7 +40,7 @@ def get_used_tokens(filename) :
   for (prev, curr, next_tok) in itertools.izip(prev_iter, curr_iter, next_iter) :
     if str(prev[0]) in ['Token.Operator', 'Token.Keyword.Type'] and prev[1] == '.' :
       continue
-    if (str(next_tok[1])) == '=>' :
+    if (next_tok[1]) == u'=>' :
       continue
     if str(curr[0]) in ['Token.Name.Class', 'Token.Keyword.Type'] and curr[1][0].isupper() :
       if is_declaration(prev[1]) :
@@ -59,6 +60,7 @@ def get_unimported_tokens(filename, imported_tokens) :
   return [t for t in used_tokens if t not in as_set and needs_import(t)]
 
 # Copied from the "scala" package, and also from Predef.scala
+# And we add Value because it's frequently seen in enums
 known_tokens = set([
   'AbstractMethodError',
   'Any',
@@ -130,6 +132,7 @@ known_tokens = set([
   'Thread',
   'Triple',
   'Unit',
+  'Value',
   'Vector',
 ] + list(string.uppercase)
   + ['Function' + str(i) for i in range(0,23)]
@@ -316,9 +319,12 @@ def fix_imports(write_lines) :
 
   return real_lines if has_seen_imports else write_lines
 
-if __name__ == "__main__" :
+def files_from_git() :
   lines = subprocess.check_output(["git", "diff", "origin/master", "--numstat"]).split("\n")
-  files = (line.split("\t")[2] for line in lines if len(line) > 0)
+  return (line.split("\t")[2] for line in lines if len(line) > 0)
+
+if __name__ == "__main__" :
+  files = provided_files or files_from_git()
   files_to_scan = (f for f in files if can_scan_for_imports(f))
 
   for f in files_to_scan:
