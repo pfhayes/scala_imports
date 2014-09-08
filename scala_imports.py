@@ -270,7 +270,7 @@ def add_imports(filename, imports) :
 
   def do_add_imports() :
     for i in imports :
-      print 'Adding import to %s: %s' % (filename, i)
+      print 'Adding %s to %s' % (i, filename)
     write_lines.extend(("import " + i + "\n" for i in imports))
 
   with open(filename, 'r') as f :
