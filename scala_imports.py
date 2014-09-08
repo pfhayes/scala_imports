@@ -324,8 +324,14 @@ def files_from_git() :
   lines = subprocess.check_output(["git", "diff", "origin/master", "--numstat"]).split("\n")
   return (line.split("\t")[2] for line in lines if len(line) > 0)
 
+def validate_file_list(files) :
+  for f in files :
+    if not os.path.isfile(f) :
+      print "Invalid file: " + f
+      exit(1)
+
 if __name__ == "__main__" :
-  files = provided_files or files_from_git()
+  files = validate_file_list(provided_files) or files_from_git()
   files_to_scan = (f for f in files if can_scan_for_imports(f))
 
   for f in files_to_scan:
