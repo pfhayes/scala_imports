@@ -110,6 +110,7 @@ known_tokens = set([
   'None',
   'Numeric',
   'NullPointerException',
+  'Object',
   'OptManifest',
   'Option',
   'Ordered',
